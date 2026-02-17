@@ -1,0 +1,23 @@
+{
+  "name": "social-arbitrage",
+  "version": "0.1.0",
+  "description": "Social signal detection for swing trading",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "ingest": "node scripts/ingest.js",
+    "analyze": "node scripts/analyze.js"
+  },
+  "dependencies": {
+    "next": "^14.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.10.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.0",
+    "typescript": "^5.3.0"
+  }
+}
