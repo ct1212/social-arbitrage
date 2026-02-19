@@ -105,30 +105,34 @@ class XResearchIngestor {
     const lines = output.split('\n');
     
     let currentTweet = null;
+    let inTweetText = false;
     
-    for (const line of lines) {
-      // Match tweet header: "@username: "
-      const userMatch = line.match(/^@(\w+):\s*(.+)$/);
-      if (userMatch) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Match tweet header: "- **@username** (833L 52587I) [Tweet](url)"
+      const headerMatch = line.match(/-\s+\*\*@(\w+)\*\*\s*\((\d+)L\s+(\d+)I\)\s*\[Tweet\]\((https:\/\/[^)]+)\)/);
+      if (headerMatch) {
         if (currentTweet) tweets.push(currentTweet);
         currentTweet = {
-          username: userMatch[1],
-          text: userMatch[2],
-          likes: 0,
-          url: ''
+          username: headerMatch[1],
+          likes: parseInt(headerMatch[2]),
+          impressions: parseInt(headerMatch[3]),
+          url: headerMatch[4],
+          text: ''
         };
+        inTweetText = true;
+        continue;
       }
       
-      // Match likes: "❤️ 42 likes"
-      const likesMatch = line.match(/❤️\s*(\d+)\s*likes?/);
-      if (likesMatch && currentTweet) {
-        currentTweet.likes = parseInt(likesMatch[1]);
-      }
-      
-      // Match URL: "[Tweet](url)"
-      const urlMatch = line.match(/\[Tweet\]\((https:\/\/[^)]+)\)/);
-      if (urlMatch && currentTweet) {
-        currentTweet.url = urlMatch[1];
+      // Collect tweet text (lines starting with "> ")
+      if (currentTweet && inTweetText) {
+        const textMatch = line.match(/^\s*>\s*(.+)$/);
+        if (textMatch) {
+          currentTweet.text += (currentTweet.text ? ' ' : '') + textMatch[1];
+        } else if (line.trim() === '' || line.startsWith('Links:')) {
+          inTweetText = false;
+        }
       }
     }
     
