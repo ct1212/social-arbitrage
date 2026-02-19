@@ -222,17 +222,18 @@ class SocialArbitragePoster {
         text: `X-Research Signal • Based on ${signal.metrics.totalMentions} tweets analyzed` 
       });
 
-    // Add top tweets as separate fields
+    // Add top tweets as separate fields with clickable links
     if (signal.topTweets && signal.topTweets.length > 0) {
-      const topTweetsText = signal.topTweets.slice(0, 3).map((t, i) => {
-        const text = t.text.length > 80 ? t.text.substring(0, 80) + '...' : t.text;
-        return `${i + 1}. @${t.username}: "${text}" (${t.likes} likes)`;
-      }).join('\n\n');
-
-      embed.addFields({
-        name: '🏆 Top Mentions',
-        value: topTweetsText,
-        inline: false
+      signal.topTweets.slice(0, 3).forEach((t, i) => {
+        const text = t.text.length > 60 ? t.text.substring(0, 60) + '...' : t.text;
+        // Clean URL for mobile app opening
+        const cleanUrl = t.url.replace('https://', '');
+        
+        embed.addFields({
+          name: `${i + 1}. @${t.username} • ${t.likes} likes`,
+          value: `> "${text}"\n[🔗 Open in X](${t.url})`,
+          inline: false
+        });
       });
     }
 
